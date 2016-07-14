@@ -4,7 +4,21 @@
 
 VectorizedRoutines.jl provides a library of familiar and useful vectorized routines. This package hopes to include high-performance, tested, and documented  Julia implementations  of routines which MATLAB/Python/R users would be familiar with. We also welcome generally useful routines for operating on vectors.
 
-Current Functions:
+# Installation
+
+Since the package is currently unregistered, you can install the package by cloning the repository:
+
+```julia
+Pkg.clone("https://github.com/ChrisRackauckas/VectorizedRoutines.jl")
+```
+
+To use the package, simply call
+
+```julia
+using VectorizedRoutines
+```
+
+# Current Functions
 
 - MATLAB
   - ngrid
