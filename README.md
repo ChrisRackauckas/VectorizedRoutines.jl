@@ -18,6 +18,28 @@ To use the package, simply call
 using VectorizedRoutines
 ```
 
+# Using the Package
+
+The functions from R/Python/MATLAB are implemented in order to match the functionality
+of their appropriate packages. In order to not have namespace issues, they are
+contained in appropriate modules, so you would call the MATLAB functions like:
+
+```julia
+mgrid = MATLAB.meshgrid(0:1//4:1,0:1//8:1)
+```
+
+and the R functions like:
+
+```julia
+v1=1:5
+v2 = 5:-1:1
+repped = R.rep(v1,v2)
+```
+
+Although these look like they are calling some outside package from these languages,
+they are bonafide Julia implementations and thus can handle Julia specific issues
+(like using Rational numbers in the meshgrid).
+
 # Current Functions
 
 - MATLAB
@@ -25,3 +47,5 @@ using VectorizedRoutines
   - meshgrid
   - accumarray (fast)
   - accumarray2 (more functionality)
+- R
+  - rep
