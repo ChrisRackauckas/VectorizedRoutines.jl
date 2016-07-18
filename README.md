@@ -50,3 +50,4 @@ they are bonafide Julia implementations and thus can handle Julia specific issue
 - R
   - rep
   - findinterval
+  - rpois
