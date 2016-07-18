@@ -50,4 +50,4 @@ they are bonafide Julia implementations and thus can handle Julia specific issue
 - R
   - rep
   - findinterval
-  - rpois ([fast on vectors of theta](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
+  - rpois ([fast on vectors](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
