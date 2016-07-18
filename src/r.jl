@@ -1,5 +1,7 @@
 module R
 
+  using Distributions
+  
   """
   rep(x,each)
 
@@ -18,9 +20,9 @@ module R
     index = 0
     for i in 1:times
       for j in eachindex(x)
-        for k in 1:each[j]
+        @inbounds for k in 1:each[j]
           index += 1
-          rval[index] = x[j]
+          @inbounds rval[index] = x[j]
         end
       end
     end
@@ -59,4 +61,15 @@ module R
       return(indices)
   end
   findinterval(v::AbstractVector, x::AbstractVector) = findinterval(v, x, 1, length(v))
+
+  """
+  rpois()
+  """
+  function rpois(n::Int,p::Vector{Float64})
+    out = Vector{Int}(n)
+    for i in 1:n
+      @inbounds out[i] = rand(Poisson(p[i]))
+    end
+    out
+  end
 end
