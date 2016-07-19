@@ -1,20 +1,14 @@
 module R
 
   using Distributions
-  
+
   """
   rep(x,each)
 
   Originally due to RLEVectors.jl
   """
-  function rep{T1,T2}(x::Union{Any,AbstractVector{T1}}; each::Union{Int,AbstractVector{T2}} = ones(Int,length(x)), times::Int = 1)
-    if !(typeof(x) <: AbstractVector)
-      x = [ x ]
-    end
-    if (typeof(each) <: Int)
-      each = [ each for i in eachindex(x) ]
-    end
-    length(x) != length(each) && throw(ArgumentError("If the arguemnt 'each' is not a scalar, it must have the same length as 'x'."))
+  function rep{T1,T2}(x::AbstractVector{T1},each::AbstractVector{T2} = ones(Int,length(x)), times::Int = 1)
+    length(x) != length(each) && throw(ArgumentError("If the argument 'each' is not a scalar, it must have the same length as 'x'."))
     length_out = sum(each * times)
     rval = similar(x,length_out)
     index = 0
@@ -28,6 +22,9 @@ module R
     end
     return(rval)
   end
+
+  rep(x::Any,each::Int=1,times::Int = 1) = rep(x,each = [ each for i in eachindex(x) ],times=times)
+  rep{T2}(x::Any,each::AbstractVector{T2}=[1],times::Int = 1) = rep([x],each=each,times=times)
 
   """
   findinterval(v,x)
