@@ -1,6 +1,6 @@
 module R
 
-  using Distributions
+  using Distributions, StatsFuns
 
   """
   rep(x,each)
@@ -14,7 +14,7 @@ module R
     index = 0
     for i in 1:times
       for j in eachindex(x)
-        @inbounds for k in 1:each[j]
+        @inbounds @simd for k in 1:each[j]
           index += 1
           @inbounds rval[index] = x[j]
         end
@@ -65,7 +65,7 @@ module R
   function rpois(n::Int,p::Vector{Float64})
     out = Vector{Int}(n)
     for i in 1:n
-      @inbounds out[i] = rand(Poisson(p[i]))
+      @inbounds out[i] = StatsFuns.RFunctions.poisrand(p[i]) #rand(Poisson(p[i])) #
     end
     out
   end
