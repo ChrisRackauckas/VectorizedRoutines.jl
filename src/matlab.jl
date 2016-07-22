@@ -95,4 +95,52 @@ module MATLAB
      end
      issparse ? sparse(A) : A
   end
+
+  """
+  Originally from MATLABCompat.jl
+  """
+  function disp(string)
+    println(string)
+    return true
+  end
+
+  #
+  """
+  Covert number to a string in a MATLAB style
+  Originally from MATLABCompat.jl
+  """
+  function num2str(number)
+    string = "$number"
+    return string
+  end
+
+  """
+  Wrapper for the Julia function string for compatibility with MATLAB syntax
+  Originally from MATLABCompat.jl
+  """
+  function strcat(stringsToAdd...)
+    concatenatedString = ""
+    for i in 1:length(stringsToAdd)
+      concatenatedString = string(concatenatedString, stringsToAdd[i])
+    end
+    return concatenatedString
+  end
+
+  """
+  Wrapper for the numel function
+  Originally from MATLABCompat.jl
+  """
+  function numel(matrix)
+    numberOfElements = length(matrix)
+    return numberOfElements
+  end
+
+  """
+  Wrapper for the max function
+  Originally from MATLABCompat.jl
+  """
+  function max(vector)
+    maxOfVector = maximum(vector)
+    return maxOfVector
+  end
 end
