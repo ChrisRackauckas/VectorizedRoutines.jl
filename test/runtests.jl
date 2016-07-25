@@ -15,3 +15,8 @@ xs[26] = 42
 @test Xs[2][4,5] == 42
 Xs[2][3,5] = 100
 @test xs[25] == 100 # 100
+
+@test (Python.@vcomp Int[i^2 for i in 1:10] when i % 2 == 0) == Int[4, 16, 36, 64, 100]
+words = ["ant", "akita", "bear", "cow"]
+@test (Python.@vcomp [uppercase(word) for word in words] when startswith(word, "a")) == Any["ANT", "AKITA"]
+@test (Python.@vcomp Tuple[(i, e) for (i, e) in enumerate(reverse(1:10))] when i-e < 0) == Tuple[(1,10),(2,9),(3,8),(4,7),(5,6)]
