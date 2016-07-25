@@ -15,6 +15,7 @@ module Julia
           indexprev = indexcurr
           indexcurr = indexprev + prod(dimss[i])
           indices = (indexprev+1):indexcurr
+          VERSION > v"0.4+" || (view = sub)
           flatsubarray = view(parent, indices)
           arrays[i] = reshape(flatsubarray, dimss[i])
       end
