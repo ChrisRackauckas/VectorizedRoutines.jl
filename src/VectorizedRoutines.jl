@@ -1,8 +1,12 @@
+__precompile__()
+
 module VectorizedRoutines
 
 include("matlab.jl")
 include("r.jl")
 
-export R, MATLAB
+include("julia.jl")
+
+export R, Matlab, Julia
 
 end # module

@@ -41,7 +41,7 @@ module R
   end
 
   rep(x::Any,each::Int=1,times::Int = 1) = rep(x,each = [ each for i in eachindex(x) ],times=times)
-  rep{T2}(x::Any,each::AbstractVector{T2}=[1],times::Int = 1) = rep([x],each=each,times=times)
+  rep{T2}(x::Any,each::AbstractVector{T2},times::Int = 1) = rep([x],each=each,times=times)
 
   """
   findinterval(v,x)

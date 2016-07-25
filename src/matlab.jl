@@ -1,4 +1,4 @@
-module MATLAB
+module Matlab
   ndgrid(v::AbstractVector) = copy(v)
 
   function ndgrid{T}(v1::AbstractVector{T}, v2::AbstractVector{T})
