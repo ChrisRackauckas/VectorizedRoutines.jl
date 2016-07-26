@@ -143,4 +143,10 @@ module Matlab
     maxOfVector = maximum(vector)
     return maxOfVector
   end
+
+  function findpeaks(img::AbstractArray, region=coords_spatial(img), edges=true)
+    idxs = findlocalmaxima(img, region=region, edges=edges)
+    return imgs[idxs],idxs
+  end
+
 end
