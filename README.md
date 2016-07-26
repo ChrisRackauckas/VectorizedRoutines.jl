@@ -40,13 +40,18 @@ Although these look like they are calling some outside package from these langua
 they are bonafide Julia implementations and thus can handle Julia specific issues
 (like using Rational numbers in the meshgrid).
 
-# Current Functions
+# Current Functions and Macros
 
 - MATLAB
   - ngrid
   - meshgrid
   - accumarray (fast)
   - accumarray2 (more functionality)
+
+- Python
+  - `@vcomp` (*vector comprehension*) macro based on Python's list comprehensions
+with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[i^2 for i in 1:10] when i % 2 == 0    # Int[4, 16, 36, 64, 100]`
+
 - R
   - rep
   - findinterval
