@@ -25,7 +25,7 @@ of their appropriate packages. In order to not have namespace issues, they are
 contained in appropriate modules, so you would call the MATLAB functions like:
 
 ```julia
-mgrid = MATLAB.meshgrid(0:1//4:1,0:1//8:1)
+mgrid = Matlab.meshgrid(0:1//4:1,0:1//8:1)
 ```
 
 and the R functions like:
@@ -47,12 +47,22 @@ they are bonafide Julia implementations and thus can handle Julia specific issue
   - meshgrid
   - accumarray (fast)
   - accumarray2 (more functionality)
-
+  - Compatibility Functions:
+    - disp
+    - strcat
+    - num2str
+    - max
+    - numel
 - Python
   - `@vcomp` (*vector comprehension*) macro based on Python's list comprehensions
 with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[i^2 for i in 1:10] when i % 2 == 0    # Int[4, 16, 36, 64, 100]`
 
 - R
   - rep
+  - rep!
   - findinterval
   - rpois ([fast on vectors](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
+  - rpois!
+
+- Julia
+  - multireshape (a reshape which can produce views to multiple arrays)
