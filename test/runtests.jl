@@ -3,10 +3,10 @@ using Base.Test
 
 # MATLAB
 
-bool1 = size(Matlab.meshgrid(0:0.1:1),1) == 2
-bool2 = size(Matlab.meshgrid(0:0.1:1)[1]) == (11,11)
-bool3 = Matlab.meshgrid(0:0.1:1) ==Matlab.meshgrid(0:0.1:1,0:0.1:1)
-bool4 = size(Matlab.meshgrid(0:0.1:1,0:0.1:1,0:0.1:1)[1]) == (11,11,11)
+@test size(Matlab.meshgrid(0:0.1:1),1) == 2
+@test size(Matlab.meshgrid(0:0.1:1)[1]) == (11,11)
+@test Matlab.meshgrid(0:0.1:1) ==Matlab.meshgrid(0:0.1:1,0:0.1:1)
+@test size(Matlab.meshgrid(0:0.1:1,0:0.1:1,0:0.1:1)[1]) == (11,11,11)
 
 # R
 
