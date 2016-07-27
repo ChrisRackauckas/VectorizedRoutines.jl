@@ -4,8 +4,11 @@ os:
   - linux
   - osx
 julia:
-#  - release # Not until v0.5 release
+  - release # Not until v0.5 release
   - nightly
+matrix:
+  allow_failures:
+    - julia: release
 notifications:
   email: false
 # uncomment the following lines to override the default test script
