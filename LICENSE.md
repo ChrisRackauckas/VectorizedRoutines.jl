@@ -20,3 +20,12 @@ The VectorizedRoutines.jl package is licensed under the MIT "Expat" License:
 > CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 > TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 > SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Origional author acknowledgments
+
+We acknowledge the following authors for original implementations which have been adapted for use in this package:
+
+- Jeff Bezanson, Stefan Karpinski, Tim Holy, Patrick Kofod Mogensen for [meshgrid and ngrid](https://github.com/JuliaLang/julia/blob/master/examples/ndgrid.jl).
+- Various MATLAB implementations are origionally due to Artur Yakimovich from MATLABCompat.jl and are mentioned in the source code.
+- R's rep and findinterval implementations are origionally due to Peter Haverty via RLEVectors.jl.
+- [accumarray was originally due to Tim Holy](https://groups.google.com/forum/#!searchin/julia-users/Equivalent$20to$20MATLAB$2FOctave$20accumarray()%7Csort:relevance/julia-users/QwdFHbbasis/St5HwXweL5UJ), while [accumarray2 was origionally due to Stefan Karpinski](https://groups.google.com/forum/#!msg/julia-users/QNlwE2wsZrU/FCerayBUMZ0J).
