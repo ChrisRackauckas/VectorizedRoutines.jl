@@ -6,16 +6,18 @@ VectorizedRoutines.jl provides a library of familiar and useful vectorized routi
 
 # Installation
 
-Since the package is currently unregistered, you can install the package by cloning the repository:
+
+To install the package, simply use:
 
 ```julia
-Pkg.clone("https://github.com/ChrisRackauckas/VectorizedRoutines.jl")
+Pkg.add("VectorizedRoutines")
+using VectorizedRoutines
 ```
 
-To use the package, simply call
+For the latest features, switch to the master branch via:
 
 ```julia
-using VectorizedRoutines
+Pkg.checkout("VectorizedRoutines")
 ```
 
 # Using the Package
