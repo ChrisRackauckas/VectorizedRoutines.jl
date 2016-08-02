@@ -42,6 +42,13 @@ Although these look like they are calling some outside package from these langua
 they are bonafide Julia implementations and thus can handle Julia specific issues
 (like using Rational numbers in the meshgrid).
 
+If you want to export the functions to the main namespace, simply use the commands like this:
+
+```julia
+using VectorizedRoutines.R
+rpois(1,[5.2;3.3]) # Same as R.rpois(1,[5.2;3.3])
+```
+
 # Current Functions and Macros
 
 - MATLAB
