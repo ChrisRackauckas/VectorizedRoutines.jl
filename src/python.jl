@@ -1,5 +1,5 @@
 module Python
-
+    export @vcomp
 """
     @vcomp(comprehension::Expr, when::Symbol, condition)
 
