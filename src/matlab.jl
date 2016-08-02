@@ -1,4 +1,8 @@
 module Matlab
+
+  export ndgrid, meshgrid, accumarray, accumarray2, disp, num2str, strcat, numel, findpeaks
+  # No max becuase... issues
+  
   ndgrid(v::AbstractVector) = copy(v)
 
   function ndgrid{T}(v1::AbstractVector{T}, v2::AbstractVector{T})
