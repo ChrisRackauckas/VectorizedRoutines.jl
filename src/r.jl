@@ -82,7 +82,7 @@ module R
   function rpois(n::Int,p::Vector{Float64})
     out = Vector{Int}(n)
     for i in 1:n
-      @inbounds out[i] = StatsFuns.RFunctions.poisrand(p[i]) #rand(Poisson(p[i])) #
+      @inbounds out[i] = rand(Poisson(p[i]))
     end
     out
   end
@@ -90,7 +90,7 @@ module R
   function rpois!(n::Int,p::Vector{Float64},out::Vector{Int})
     resize!(out,n)
     for i in 1:n
-      @inbounds out[i] = StatsFuns.RFunctions.poisrand(p[i]) #rand(Poisson(p[i])) #
+      @inbounds out[i] = rand(Poisson(p[i])) 
     end
   end
 end
