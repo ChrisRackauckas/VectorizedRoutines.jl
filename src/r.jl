@@ -1,5 +1,5 @@
 module R
-
+  export rep, rep!, findinterval, rpois, rpois!
   using Distributions, StatsFuns
 
   """
