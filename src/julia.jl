@@ -1,5 +1,5 @@
 module Julia
-
+    export multireshape
 """
 `multireshape(A, dims1, dims2[, ...])`
 
