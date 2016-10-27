@@ -4,7 +4,7 @@ os:
   - linux
   - osx
 julia:
-  - release # Not until v0.5 release
+  - 0.5
   - nightly
 matrix:
   allow_failures:
