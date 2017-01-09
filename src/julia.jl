@@ -56,23 +56,6 @@ function pairwise(f::Function, a) # I tried having a symmetric keyword, but that
     r
 end
 
-# function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
-#     in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
-#     n = length(a)
-#     idx = if oneway && ondiag
-#         [[i >= j for i in 1:n, j in 1:n]]
-#     elseif oneway
-#         [[i > j for i in 1:n, j in 1:n]]
-#     elseif !ondiag
-#         [[i != j for i in 1:n, j in 1:n]]
-#     else
-#         trues(n,n)
-#     end
-#
-#     vec(pairwise(f, a)[idx])
-# end
-
-
 function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
     in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
     n = length(a)
@@ -101,21 +84,9 @@ function pairwise!(f::Function, a, r::AbstractMatrix)
             r[i,j] = f(a[i], aj)
         end
     end
-    #r
+    r
 end
 
-# function pairwise!(f::Function, a, r::LowerTriangular)
-#     f = tryfunc(f, a[1], a[1])
-#     n = length(a)
-#     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
-#     for j = 1 : n
-#         aj = a[j]
-#         @inbounds for i = j : n
-#             r[i,j] = f(a[i], aj)
-#         end
-#     end
-#     #r
-# end
 
 function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = false)
     f = tryfunc(f, a[1], a[1])
@@ -131,7 +102,7 @@ function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = fa
             end
         end
     end
-    #r #should the in-place function be returning the result matrix?
+    r
 end
 
 
