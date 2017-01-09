@@ -45,7 +45,7 @@ Apply the function `f` to all pairwise combinations of elements from `a`.
 function be run for an element and itself)
 * `oneway` (i.e. should only `f(x,y)` be calculated when `f(x,y) == f(y,x)`?).
 The vector form is convenient e.g. for calculating summaries of pairwise results
-(e.g. `mean(pairwise(prod, 1:10, :vec))`). See also `pairwise!`
+(e.g. `mean(pairwise(prod, 1:10, :vec))`), but is slower. See also `pairwise!`
 """
 function pairwise(f::Function, a) # I tried having a symmetric keyword, but that made no difference on efficiency
     n = length(a)
@@ -56,33 +56,33 @@ function pairwise(f::Function, a) # I tried having a symmetric keyword, but that
     r
 end
 
-function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
-    in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
-    n = length(a)
-    idx = if oneway && ondiag
-        [[i >= j for i in 1:n, j in 1:n]]
-    elseif oneway
-        [[i > j for i in 1:n, j in 1:n]]
-    elseif !ondiag
-        [[i != j for i in 1:n, j in 1:n]]
-    else
-        trues(n,n)
-    end
-
-    vec(pairwise(f, a)[idx])
-end
-
-
 # function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
 #     in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
 #     n = length(a)
-#     outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
-#     f = tryfunc(f, a[1], a[1])
-#     first = f(a[1], a[1])
-#     r = Vector{typeof(first)}(outlength)
-#     pairwise!(f, a, r)
-#     r
+#     idx = if oneway && ondiag
+#         [[i >= j for i in 1:n, j in 1:n]]
+#     elseif oneway
+#         [[i > j for i in 1:n, j in 1:n]]
+#     elseif !ondiag
+#         [[i != j for i in 1:n, j in 1:n]]
+#     else
+#         trues(n,n)
+#     end
+#
+#     vec(pairwise(f, a)[idx])
 # end
+
+
+function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
+    in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
+    n = length(a)
+    outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
+    f = tryfunc(f, a[1], a[1])
+    first = f(a[1], a[1])
+    r = Vector{typeof(first)}(outlength)
+    pairwise!(f, a, r)
+    r
+end
 
 
 """
@@ -117,22 +117,22 @@ end
 #     #r
 # end
 
-# function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = false)
-#     f = tryfunc(f, a[1], a[1])
-#     n = length(a)
-#     outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
-#     length(r) == outlength || throw(DimensionMismatch("Incorrect size of r ($(length(r)), should be $outlength"))
-#     idx = 0
-#     for j = 1 : n
-#         aj = a[j]
-#         @inbounds for i = (oneway ? (j:n) : (1:n))
-#             if i != j || ondiag
-#                 r[idx += 1] = f(a[i], aj)
-#             end
-#         end
-#     end
-#     #r #should the in-place function be returning the result matrix?
-# end
+function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = false)
+    f = tryfunc(f, a[1], a[1])
+    n = length(a)
+    outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
+    length(r) == outlength || throw(DimensionMismatch("Incorrect size of r ($(length(r)), should be $outlength"))
+    idx = 0
+    for j = 1 : n
+        aj = a[j]
+        @inbounds for i = (oneway ? (j:n) : (1:n))
+            if i != j || ondiag
+                r[idx += 1] = f(a[i], aj)
+            end
+        end
+    end
+    #r #should the in-place function be returning the result matrix?
+end
 
 
 
