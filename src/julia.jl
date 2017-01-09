@@ -1,5 +1,5 @@
 module Julia
-    export multireshape
+    export multireshape, pairwise, pairwise!
 """
 `multireshape(A, dims1, dims2[, ...])`
 
@@ -31,6 +31,136 @@ end
 # Allow dimensions to be passed as array.
 function multireshape(parent::AbstractArray, dimss::Array{Tuple{Vararg{Int}}})
     multireshape(parent, dimss...)
+end
+
+
+"""
+    pairwise(f::Function, a::AbstractVector[, output]; kwargs...)
+
+Apply the function `f` to all pairwise combinations of elements from `a`.
+
+# Arguments
+* `output`: specify `:Vector` to return a `Vector` and offer keywords:
+* `ondiag`: should the diagonal be computed, i.e. should the
+function be run for an element and itself)
+* `oneway` (i.e. should only `f(x,y)` be calculated when `f(x,y) == f(y,x)`?).
+The vector form is convenient e.g. for calculating summaries of pairwise results
+(e.g. `mean(pairwise(prod, 1:10, :vec))`). See also `pairwise!`
+"""
+function pairwise(f::Function, a) # I tried having a symmetric keyword, but that made no difference on efficiency
+    n = length(a)
+    f = tryfunc(f, a[1], a[1])
+    first = f(a[1], a[1])
+    r = Matrix{typeof(first)}(n, n)
+    pairwise!(f, a, r)
+    r
+end
+
+function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
+    in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
+    n = length(a)
+    idx = if oneway && ondiag
+        [[i >= j for i in 1:n, j in 1:n]]
+    elseif oneway
+        [[i > j for i in 1:n, j in 1:n]]
+    elseif !ondiag
+        [[i != j for i in 1:n, j in 1:n]]
+    else
+        trues(n,n)
+    end
+
+    vec(pairwise(f, a)[idx])
+end
+
+
+# function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
+#     in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
+#     n = length(a)
+#     outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
+#     f = tryfunc(f, a[1], a[1])
+#     first = f(a[1], a[1])
+#     r = Vector{typeof(first)}(outlength)
+#     pairwise!(f, a, r)
+#     r
+# end
+
+
+"""
+    pairwise!(f::Function, a, r[, output])
+
+Apply the function `f` to all pairwise combinations of elements from `a` and
+storing the results in `r`.
+"""
+function pairwise!(f::Function, a, r::AbstractMatrix)
+    f = tryfunc(f, a[1], a[1])
+    n = length(a)
+    size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
+    for j = 1:n
+        aj = a[j]
+        @inbounds for i = 1:n
+            r[i,j] = f(a[i], aj)
+        end
+    end
+    #r
+end
+
+# function pairwise!(f::Function, a, r::LowerTriangular)
+#     f = tryfunc(f, a[1], a[1])
+#     n = length(a)
+#     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
+#     for j = 1 : n
+#         aj = a[j]
+#         @inbounds for i = j : n
+#             r[i,j] = f(a[i], aj)
+#         end
+#     end
+#     #r
+# end
+
+# function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = false)
+#     f = tryfunc(f, a[1], a[1])
+#     n = length(a)
+#     outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
+#     length(r) == outlength || throw(DimensionMismatch("Incorrect size of r ($(length(r)), should be $outlength"))
+#     idx = 0
+#     for j = 1 : n
+#         aj = a[j]
+#         @inbounds for i = (oneway ? (j:n) : (1:n))
+#             if i != j || ondiag
+#                 r[idx += 1] = f(a[i], aj)
+#             end
+#         end
+#     end
+#     #r #should the in-place function be returning the result matrix?
+# end
+
+
+
+# makes it possible to apply both functions that are defined for two arguments
+# (e.g. `distance(x, y)`) and for a vector with two elements (e.g. `sum([x, y])`)
+# I worry about abusing the try-catch syntax here, I have jumped through some
+# hoops to ensure error handling is sensible
+function tryfunc(f::Function, x, y)
+    try
+        f(x,y)
+    catch e
+        if isa(e, MethodError)
+            try
+                f([x,y])
+            catch e2
+                if isa(e2, MethodError)
+                    throw(e)
+                else
+                    throw(e2)
+                end
+            end
+            g(x, y) = f([x, y])
+            return g
+        else
+            throw(e)
+        end
+    end
+    return f
 end
 
 end

@@ -30,3 +30,9 @@ xs[26] = 42
 @test Xs[2][4,5] == 42
 Xs[2][3,5] = 100
 @test xs[25] == 100 # 100
+
+# pairwise
+func(x,y) = sqrt(x^2 + y^2)
+@test isapprox(mean(Julia.pairwise(func, xs)), 20.542901932949146)
+@test isapprox(mean(Julia.pairwise(func, xs, :vec, ondiag = false)), 20.60094268658563) #ignoring the diagonal makes the difference
+@test mean(Julia.pairwise(prod, xs)) == 182.25 # using a vectorized function instead

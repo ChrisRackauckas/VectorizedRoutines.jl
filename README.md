@@ -75,3 +75,5 @@ with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[
 
 - Julia
   - multireshape (a reshape which can produce views to multiple arrays)
+  - pairwise (apply a function to all pairwise combinations of elements from an array)
+  - pairwise!
