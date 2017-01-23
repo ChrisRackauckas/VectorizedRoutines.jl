@@ -35,27 +35,32 @@ end
 
 
 """
-    pairwise(f::Function, a::AbstractVector[, output]; kwargs...)
+    pairwise(f::Function, a; kwargs...)
 
-Apply the function `f` to all pairwise combinations of elements from `a`.
-
-# Arguments
-* `output`: specify `:Vector` to return a `Vector` and offer keywords:
-* `ondiag`: should the diagonal be computed, i.e. should the
-function be run for an element and itself)
-* `oneway` (i.e. should only `f(x,y)` be calculated when `f(x,y) == f(y,x)`?).
-The vector form is convenient e.g. for calculating summaries of pairwise results
-(e.g. `mean(pairwise(prod, 1:10, :vec))`), but is slower. See also `pairwise!`
+Apply the function `f` to all pairwise combinations of elements from `a`. Set
+keyword `symmetric = true` to only calculate `f(x,y)` when `f(x,y) == f(y,x)`.
 """
-function pairwise(f::Function, a) # I tried having a symmetric keyword, but that made no difference on efficiency
+function pairwise(f::Function, a; symmetric = false)
     n = length(a)
     f = tryfunc(f, a[1], a[1])
     first = f(a[1], a[1])
     r = Matrix{typeof(first)}(n, n)
-    pairwise!(f, a, r)
+    pairwise!(f, a, r; symmetric = symmetric)
     r
 end
 
+"""
+    pairwise(f::Function, a, output; kwargs...)
+
+Apply the function `f` to all pairwise combinations of elements from `a`, and
+return a `Vector` of the results if `output = :Vector`. The Vector form is
+convenient for calculating summaries of pairwise results
+(e.g. `mean(pairwise(prod, 1:10, :vec))`), but is slower. See also `pairwise!`
+
+# Arguments
+* `ondiag`: should the diagonal be computed, i.e. should the function be run for an element and itself)
+* `oneway`: should only `f(x,y)` be calculated when `f(x,y) == f(y,x)`?.
+"""
 function pairwise(f::Function, a, output::Symbol; oneway = true, ondiag = false)
     in(output, [:vec, :vector, :Vector]) || throw(ArgumentError("Only vector and matrix output defined"))
     n = length(a)
@@ -69,34 +74,63 @@ end
 
 
 """
-    pairwise!(f::Function, a, r[, output])
+    pairwise!(f::Function, a, r)
 
 Apply the function `f` to all pairwise combinations of elements from `a` and
-storing the results in `r`.
+storing the results in `r`. Setting keyword `symmetric = true` will only calculate
+each variable combination once for symmetric functions. This is useful if `f` is
+expensive.
 """
-function pairwise!(f::Function, a, r::AbstractMatrix)
+function pairwise!(f::Function, a, r::AbstractMatrix; symmetric = false)
     f = tryfunc(f, a[1], a[1])
     n = length(a)
     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
-    for j = 1:n
+    if symmetric
+        pairwise_symmetric!(f, a, r, n)
+    else
+        pairwise_default!(f, a, r, n)
+    end
+end
+
+function pairwise_default!(f, a, r, n)
+    @inbounds for j = 1:n
         aj = a[j]
-        @inbounds for i = 1:n
+        for i = 1:n
             r[i,j] = f(a[i], aj)
         end
     end
-    r
 end
 
+function pairwise_symmetric!(f, a, r, n)
+    @inbounds for j = 1:n
+        aj = a[j]
+        for i = j:n
+            tmp = f(a[i], aj)
+            r[i,j] = tmp
+            r[j,i] = tmp
+        end
+    end
+end
 
+"""
+    pairwise!(f::Function, a, r::AbstractVector; kwargs...)
+
+Apply the function `f` to all pairwise combinations of elements from `a`, and
+store the results in `r`
+
+# Arguments
+* `ondiag`: should the diagonal be computed, i.e. should the function be run for an element and itself)
+* `oneway`: should only `f(x,y)` be calculated when `f(x,y) == f(y,x)`?.
+"""
 function pairwise!(f::Function, a, r::AbstractVector; oneway = true, ondiag = false)
     f = tryfunc(f, a[1], a[1])
     n = length(a)
     outlength = floor(Int, n * (n - 1) / (2*oneway) + n*Int(ondiag))
     length(r) == outlength || throw(DimensionMismatch("Incorrect size of r ($(length(r)), should be $outlength"))
     idx = 0
-    for j = 1 : n
+    @inbounds for j = 1 : n
         aj = a[j]
-        @inbounds for i = (oneway ? (j:n) : (1:n))
+        for i = (oneway ? (j:n) : (1:n))
             if i != j || ondiag
                 r[idx += 1] = f(a[i], aj)
             end
