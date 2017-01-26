@@ -20,7 +20,6 @@ v2 = 5:-1:1
 words = ["ant", "akita", "bear", "cow"]
 @test (Python.@vcomp [uppercase(word) for word in words] when startswith(word, "a")) == Any["ANT", "AKITA"]
 @test (Python.@vcomp Tuple[(i, e) for (i, e) in enumerate(reverse(1:10))] when i-e < 0) == Tuple[(1,10),(2,9),(3,8),(4,7),(5,6)]
-ß
 # Julia
 
 xs = collect(1:26)
@@ -35,5 +34,4 @@ Xs[2][3,5] = 100
 xs = 1:26
 func(x,y) = sqrt(x^2 + y^2)
 @test isapprox(mean(Julia.pairwise(func, xs)), 20.542901932949146)
-@test isapprox(mean(Julia.pairwise(func, xs, :vec, ondiag = false)), 20.60094268658563) #ignoring the diagonal makes the difference
-@test mean(Julia.pairwise(prod, xs)) == 182.25 # using a vectorized function instead
+@test Julia.pairwise(func, xs, Symmetric) == Symmetric(Julia.pairwise(func, xs))
