@@ -42,18 +42,20 @@ Apply the function `f` to all pairwise combinations of elements from `a`. Pass
 """
 function pairwise(f::Function, a)
     n = length(a)
+    n == 0 && error("Cannot iterate over empty array")
     firstval = f(first(a), first(a))
     r = Matrix{typeof(firstval)}(n, n)
-    pairwise_internal!(f, a, r, firstval)
+    pairwise_internal!(f, a, r, firstval, n)
     r
 end
 
 
 function pairwise(f::Function, a, ::Type{Symmetric})
     n = length(a)
+    n == 0 && error("Cannot iterate over empty array")
     firstval = f(first(a), first(a))
     r = Symmetric(Matrix{typeof(firstval)}(n, n))
-    pairwise_internal!(f, a, r, firstval)
+    pairwise_internal!(f, a, r, firstval, n)
     r
 end
 
@@ -67,51 +69,57 @@ and `f(x,y) == f(y,x)`.
 """
 function pairwise!(f::Function, a, r::AbstractMatrix)
     n = length(a)
+    n == 0 && error("Cannot iterate over empty array")
     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
-    pairwise_internal!(f, a, r, f(first(a), first(a)))
+    pairwise_internal!(f, a, r, f(first(a), first(a)),n)
 end
 
-function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T)
+function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
     r[1,1] = firstval
-    @inbounds for j in eachindex(a)
+    i, j = 2, 1
+    @inbounds  while j ≤ n
         aj = a[j]
-        for i in eachindex(a)
-            if i != 1 || j != 1
-                r[i,j] = f(a[i], aj)
-            end
+         while i ≤ n
+            r[i,j] = f(a[i], aj)
+            i += 1
         end
+        j += 1
+        i = 1
     end
 end
 
-function pairwise_internal!{T}(f, a, r::Symmetric{T}, firstval::T)
-    r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r, firstval) : pairwise_symmetric_L!(f, a, r, firstval)
+function pairwise_internal!{T}(f, a, r::Symmetric{T}, firstval::T, n)
+    r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r, firstval, n) : pairwise_symmetric_L!(f, a, r, firstval, n)
 end
 
-function pairwise_symmetric_L!(f, a, r::Symmetric, firstval)
+function pairwise_symmetric_L!(f, a, r::Symmetric, firstval, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
     r.data[1,1] = firstval
-    @inbounds for j in eachindex(a)
+    i, j = 2, 1
+    @inbounds while j ≤ n
         aj = a[j]
+        while i <= n
+            r.data[i,j] = f(a[i], aj)
+            i += 1
+        end
+        j += 1
         i = j
-        while i <= endof(a)
-            if i != 1 || j != 1
-                r.data[i,j] = f(a[i], aj)
-            end
-            i = nextind(a, i)
-        end
     end
 end
 
-function pairwise_symmetric_U!(f, a, r::Symmetric, firstval)
+function pairwise_symmetric_U!(f, a, r::Symmetric, firstval, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
     r.data[1,1] = firstval
-    @inbounds for j in eachindex(a)
+    i, j = 1, 2
+    @inbounds while j ≤ n
         aj = a[j]
-        i = start(a)
-        while i <= j
-            if i != 1 || j != 1
-                r.data[i,j] = f(a[i], aj)
-            end
-            i = nextind(a, i)
+        while i ≤ j
+            r.data[i,j] = f(a[i], aj)
+            i += 1
         end
+        j += 1
+        i = 1
     end
 end
 
