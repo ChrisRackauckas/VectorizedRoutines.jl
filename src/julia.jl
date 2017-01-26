@@ -36,7 +36,7 @@ end
 """
     pairwise(f::Function, a[, ::Type{Symmetric}])
 
-Apply the function `f` to all pairwise combinations of elements from `a`. PassPro
+Apply the function `f` to all pairwise combinations of elements from `a`. Pass
 `Symmetric` to only calculate `f(x,y)` when `f(x,y) == f(y,x)` and return a
 `Symmetric Matrix`.
 """
@@ -44,7 +44,7 @@ function pairwise(f::Function, a)
     n = length(a)
     firstval = f(first(a), first(a))
     r = Matrix{typeof(firstval)}(n, n)
-    pairwise!(f, a, r)
+    pairwise_internal!(f, a, r, firstval)
     r
 end
 
@@ -53,7 +53,7 @@ function pairwise(f::Function, a, ::Type{Symmetric})
     n = length(a)
     firstval = f(first(a), first(a))
     r = Symmetric(Matrix{typeof(firstval)}(n, n))
-    pairwise!(f, a, r)
+    pairwise_internal!(f, a, r, firstval)
     r
 end
 
@@ -61,46 +61,55 @@ end
     pairwise!(f::Function, a, r)
 
 Apply the function `f` to all pairwise combinations of elements from `a` and
-storing the results in `r`. Setting keyword `symmetric = true` will only calculate
-each variable combination once for symmetric functions. This is useful if `f` is
-expensive.
+storing the results in `r`. If `r` is a `Symmetric` the function will only
+calculate each variable combination once, which is useful if `f` is expensive
+and `f(x,y) == f(y,x)`.
 """
 function pairwise!(f::Function, a, r::AbstractMatrix)
     n = length(a)
     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
-    pairwise_internal!(f, a, r)
+    pairwise_internal!(f, a, r, f(first(a), first(a)))
 end
 
-function pairwise_internal!(f, a, r::AbstractMatrix)
+function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T)
+    r[1,1] = firstval
     @inbounds for j in eachindex(a)
         aj = a[j]
         for i in eachindex(a)
-            r[i,j] = f(a[i], aj)
+            if i != 1 || j != 1
+                r[i,j] = f(a[i], aj)
+            end
         end
     end
 end
 
-function pairwise_internal!(f, a, r::Symmetric)
-    r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r) : pairwise_symmetric_L!(f, a, r)
+function pairwise_internal!{T}(f, a, r::Symmetric{T}, firstval::T)
+    r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r, firstval) : pairwise_symmetric_L!(f, a, r, firstval)
 end
 
-function pairwise_symmetric_L!(f, a, r::Symmetric)
+function pairwise_symmetric_L!(f, a, r::Symmetric, firstval)
+    r.data[1,1] = firstval
     @inbounds for j in eachindex(a)
         aj = a[j]
         i = j
         while i <= endof(a)
-            r.data[i,j] = f(a[i], aj)
+            if i != 1 || j != 1
+                r.data[i,j] = f(a[i], aj)
+            end
             i = nextind(a, i)
         end
     end
 end
 
-function pairwise_symmetric_U!(f, a, r::Symmetric)
+function pairwise_symmetric_U!(f, a, r::Symmetric, firstval)
+    r.data[1,1] = firstval
     @inbounds for j in eachindex(a)
         aj = a[j]
         i = start(a)
         while i <= j
-            r.data[i,j] = f(a[i], aj)
+            if i != 1 || j != 1
+                r.data[i,j] = f(a[i], aj)
+            end
             i = nextind(a, i)
         end
     end
