@@ -42,7 +42,7 @@ Apply the function `f` to all pairwise combinations of elements from `a`. Pass
 """
 function pairwise(f::Function, a)
     n = length(a)
-    n == 0 && error("Cannot iterate over empty array")
+    n == 0 && return Matrix{eltype(map(x->f(x,x), a))}(0, 0)
     firstval = f(first(a), first(a))
     r = Matrix{typeof(firstval)}(n, n)
     pairwise_internal!(f, a, r, firstval, n)
@@ -52,7 +52,7 @@ end
 
 function pairwise(f::Function, a, ::Type{Symmetric})
     n = length(a)
-    n == 0 && error("Cannot iterate over empty array")
+    n == 0 && return Matrix{eltype(map(x->f(x,x), a))}(0, 0)
     firstval = f(first(a), first(a))
     r = Symmetric(Matrix{typeof(firstval)}(n, n))
     pairwise_internal!(f, a, r, firstval, n)
@@ -69,9 +69,8 @@ and `f(x,y) == f(y,x)`.
 """
 function pairwise!(f::Function, a, r::AbstractMatrix)
     n = length(a)
-    n == 0 && error("Cannot iterate over empty array")
     size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
-    pairwise_internal!(f, a, r, f(first(a), first(a)),n)
+    n == 0 || pairwise_internal!(f, a, r, f(first(a), first(a)),n)
 end
 
 function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T, n)
