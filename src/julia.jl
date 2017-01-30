@@ -42,7 +42,7 @@ Apply the function `f` to all pairwise combinations of elements from `a`. Pass
 """
 function pairwise(f::Function, a)
     n = length(a)
-    n == 0 && return Matrix{eltype(map(x->f(x,x), a))}(0, 0)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
     firstval = f(first(a), first(a))
     r = Matrix{typeof(firstval)}(n, n)
     pairwise_internal!(f, a, r, firstval, n)
@@ -52,7 +52,7 @@ end
 
 function pairwise(f::Function, a, ::Type{Symmetric})
     n = length(a)
-    n == 0 && return Matrix{eltype(map(x->f(x,x), a))}(0, 0)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
     firstval = f(first(a), first(a))
     r = Symmetric(Matrix{typeof(firstval)}(n, n))
     pairwise_internal!(f, a, r, firstval, n)
