@@ -78,9 +78,9 @@ with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[
   - `rep!`
   - `findinterval`
   - `rpois` ([fast on vectors](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
-  - `rpois!``
+  - `rpois!`
 
 - The package also offers Julia-native vectorized routines that are not found in MATLAB, Python or R.
   - `multireshape` (a reshape which can produce views to multiple arrays)
   - `pairwise` (apply a function to all pairwise combinations of elements from an array)
-  - `pairwise!``
+  - `pairwise!`
