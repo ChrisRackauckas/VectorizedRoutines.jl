@@ -1,5 +1,5 @@
 module Julia
-    export multireshape
+    export multireshape, pairwise, pairwise!
 """
 `multireshape(A, dims1, dims2[, ...])`
 
@@ -31,6 +31,95 @@ end
 # Allow dimensions to be passed as array.
 function multireshape(parent::AbstractArray, dimss::Array{Tuple{Vararg{Int}}})
     multireshape(parent, dimss...)
+end
+
+"""
+    pairwise(f::Function, a[, ::Type{Symmetric}])
+
+Apply the function `f` to all pairwise combinations of elements from `a`. Pass
+`Symmetric` to only calculate `f(x,y)` when `f(x,y) == f(y,x)` and return a
+`Symmetric Matrix`.
+"""
+function pairwise(f::Function, a)
+    n = length(a)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
+    firstval = f(first(a), first(a))
+    r = Matrix{typeof(firstval)}(n, n)
+    pairwise_internal!(f, a, r, firstval, n)
+    r
+end
+
+
+function pairwise(f::Function, a, ::Type{Symmetric})
+    n = length(a)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
+    firstval = f(first(a), first(a))
+    r = Symmetric(Matrix{typeof(firstval)}(n, n))
+    pairwise_internal!(f, a, r, firstval, n)
+    r
+end
+
+"""
+    pairwise!(f::Function, a, r)
+
+Apply the function `f` to all pairwise combinations of elements from `a` and
+storing the results in `r`. If `r` is a `Symmetric` the function will only
+calculate each variable combination once, which is useful if `f` is expensive
+and `f(x,y) == f(y,x)`.
+"""
+function pairwise!(f::Function, a, r::AbstractMatrix)
+    n = length(a)
+    size(r) == (n, n) || throw(DimensionMismatch("Incorrect size of r ($(size(r)), should be $((n, n)))"))
+    n == 0 || pairwise_internal!(f, a, r, f(first(a), first(a)),n)
+end
+
+function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
+    r[1,1] = firstval
+    i, j = 2, 1
+    @inbounds  while j ≤ n
+        aj = a[j]
+         while i ≤ n
+            r[i,j] = f(a[i], aj)
+            i += 1
+        end
+        j += 1
+        i = 1
+    end
+end
+
+function pairwise_internal!{T}(f, a, r::Symmetric{T}, firstval::T, n)
+    r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r, firstval, n) : pairwise_symmetric_L!(f, a, r, firstval, n)
+end
+
+function pairwise_symmetric_L!(f, a, r::Symmetric, firstval, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
+    r.data[1,1] = firstval
+    i, j = 2, 1
+    @inbounds while j ≤ n
+        aj = a[j]
+        while i <= n
+            r.data[i,j] = f(a[i], aj)
+            i += 1
+        end
+        j += 1
+        i = j
+    end
+end
+
+function pairwise_symmetric_U!(f, a, r::Symmetric, firstval, n)
+    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
+    r.data[1,1] = firstval
+    i, j = 1, 2
+    @inbounds while j ≤ n
+        aj = a[j]
+        while i ≤ j
+            r.data[i,j] = f(a[i], aj)
+            i += 1
+        end
+        j += 1
+        i = 1
+    end
 end
 
 end
