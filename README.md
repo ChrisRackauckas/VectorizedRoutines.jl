@@ -38,13 +38,6 @@ v2 = 5:-1:1
 repped = R.rep(v1,v2)
 ```
 
-The original Julia vectorized routines offered here do not need to be prefaced:
-
-```julia
-xs = 1:26
-pairwise((x,y)->sqrt(x^2 + y^2), xs)
-```
-
 Although these look like they are calling some outside package from these languages,
 they are bonafide Julia implementations and thus can handle Julia specific issues
 (like using Rational numbers in the meshgrid).
@@ -54,6 +47,13 @@ If you want to export the functions to the main namespace, simply use the comman
 ```julia
 using VectorizedRoutines.R
 rpois(1,[5.2;3.3]) # Same as R.rpois(1,[5.2;3.3])
+
+```
+The original Julia vectorized routines offered here do not need to be prefaced:
+
+```julia
+xs = 1:26
+pairwise((x,y)->sqrt(x^2 + y^2), xs)
 ```
 
 # Current Functions and Macros
