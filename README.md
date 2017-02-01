@@ -38,7 +38,7 @@ v2 = 5:-1:1
 repped = R.rep(v1,v2)
 ```
 
-The original Julia vectorized routines offered here does not need to be prefaced:
+The original Julia vectorized routines offered here do not need to be prefaced:
 
 ```julia
 xs = 1:26
