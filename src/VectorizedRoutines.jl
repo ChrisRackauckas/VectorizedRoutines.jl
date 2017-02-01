@@ -8,6 +8,7 @@ include("python.jl")
 include("r.jl")
 include("julia.jl")
 
-export R, Matlab, Julia, Python
+export R, Matlab, Python
+export multireshape, pairwise, pairwise!
 
 end # module

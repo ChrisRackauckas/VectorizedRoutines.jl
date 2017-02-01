@@ -23,7 +23,7 @@ words = ["ant", "akita", "bear", "cow"]
 # Julia
 
 xs = collect(1:26)
-Xs = Julia.multireshape(xs, (2,3), (4,5)) # Array of two matrices, 2×3 and 4×5
+Xs = multireshape(xs, (2,3), (4,5)) # Array of two matrices, 2×3 and 4×5
 # Now, the elements of xs and Xs reference the same memory, no copying.
 xs[26] = 42
 @test Xs[2][4,5] == 42
@@ -33,5 +33,5 @@ Xs[2][3,5] = 100
 # pairwise
 xs = 1:26
 func(x,y) = sqrt(x^2 + y^2)
-@test isapprox(mean(Julia.pairwise(func, xs)), 20.542901932949146)
-@test Julia.pairwise(func, xs, Symmetric) == Symmetric(Julia.pairwise(func, xs))
+@test isapprox(mean(pairwise(func, xs)), 20.542901932949146)
+@test pairwise(func, xs, Symmetric) == Symmetric(pairwise(func, xs))
