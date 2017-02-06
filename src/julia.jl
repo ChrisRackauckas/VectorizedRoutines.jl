@@ -1,5 +1,4 @@
-module Julia
-    export multireshape, pairwise, pairwise!
+
 """
 `multireshape(A, dims1, dims2[, ...])`
 
@@ -120,6 +119,4 @@ function pairwise_symmetric_U!(f, a, r::Symmetric, firstval, n)
         j += 1
         i = 1
     end
-end
-
 end

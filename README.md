@@ -47,33 +47,40 @@ If you want to export the functions to the main namespace, simply use the comman
 ```julia
 using VectorizedRoutines.R
 rpois(1,[5.2;3.3]) # Same as R.rpois(1,[5.2;3.3])
+
+```
+The original Julia vectorized routines offered here do not need to be prefaced:
+
+```julia
+xs = 1:26
+pairwise((x,y)->sqrt(x^2 + y^2), xs)
 ```
 
 # Current Functions and Macros
 
 - MATLAB
-  - ngrid
-  - meshgrid
-  - accumarray (fast)
-  - accumarray2 (more functionality)
+  - `ngrid`
+  - `meshgrid`
+  - `accumarray` (fast)
+  - `accumarray2` (more functionality)
   - Compatibility Functions:
-    - disp
-    - strcat
-    - num2str
-    - max
-    - numel
+    - `disp`
+    - `strcat`
+    - `num2str`
+    - `max`
+    - `numel`
 - Python
   - `@vcomp` (*vector comprehension*) macro based on Python's list comprehensions
 with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[i^2 for i in 1:10] when i % 2 == 0    # Int[4, 16, 36, 64, 100]`
 
 - R
-  - rep
-  - rep!
-  - findinterval
-  - rpois ([fast on vectors](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
-  - rpois!
+  - `rep`
+  - `rep!`
+  - `findinterval`
+  - `rpois` ([fast on vectors](http://codereview.stackexchange.com/questions/134926/benchmarks-of-scientific-programming-languages-r-julia-mathematica-matlab-f/135220#135220))
+  - `rpois!`
 
-- Julia
-  - multireshape (a reshape which can produce views to multiple arrays)
-  - pairwise (apply a function to all pairwise combinations of elements from an array)
-  - pairwise!
+- The package also offers Julia-native vectorized routines that are not found in MATLAB, Python or R.
+  - `multireshape` (a reshape which can produce views to multiple arrays)
+  - `pairwise` (apply a function to all pairwise combinations of elements from an array)
+  - `pairwise!`
