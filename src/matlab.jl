@@ -2,7 +2,7 @@ module Matlab
 
   export ndgrid, meshgrid, accumarray, accumarray2, disp, num2str, strcat, numel, findpeaks
   # No max becuase... issues
-  
+
   ndgrid(v::AbstractVector) = copy(v)
 
   function ndgrid{T}(v1::AbstractVector{T}, v2::AbstractVector{T})
@@ -80,6 +80,14 @@ module Matlab
   function accumarray(subs, val, sz=(maximum(subs),))
       A = zeros(eltype(val), sz...)
       for i = 1:length(val)
+          @inbounds A[subs[i]] += val[i]
+      end
+      A
+  end
+
+  function accumarray(subs, val::Number, sz=(maximum(subs),))
+      A = zeros(eltype(val), sz...)
+      for i = 1:length(subs)
           @inbounds A[subs[i]] += val[i]
       end
       A
