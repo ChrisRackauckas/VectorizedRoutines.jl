@@ -18,11 +18,7 @@ function multireshape(parent::AbstractArray, dimss::Tuple{Vararg{Int}}...)
     for i in 1:length(dimss)
         indexprev = indexcurr
         indexcurr = indexprev + prod(dimss[i])
-        if VERSION < v"0.5-"
-            arrays[i] = reshape(sub(parent, (indexprev+1):indexcurr), dimss[i])
-        else
-            arrays[i] = reshape(view(parent, (indexprev+1):indexcurr), dimss[i])
-        end
+        arrays[i] = reshape(view(parent, (indexprev+1):indexcurr), dimss[i])
     end
     arrays
 end
