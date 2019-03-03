@@ -13,7 +13,7 @@ In Julia versions prior to 0.5, the data _is_ copied.
 function multireshape(parent::AbstractArray, dimss::Tuple{Vararg{Int}}...)
     n = length(parent)
     sum(map(prod, dimss)) == n || throw(DimensionMismatch("parent has $n elements, which is incompatible with size $dimss"))
-    arrays = Vector(length(dimss))
+    arrays = Vector(undef,length(dimss))
     indexcurr = 0
     for i in 1:length(dimss)
         indexprev = indexcurr
@@ -41,9 +41,9 @@ Apply the function `f` to all pairwise combinations of elements from `a`. Pass
 """
 function pairwise(f::Function, a)
     n = length(a)
-    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(undef,0, 0)
     firstval = f(first(a), first(a))
-    r = Matrix{typeof(firstval)}(n, n)
+    r = Matrix{typeof(firstval)}(undef,n, n)
     pairwise_internal!(f, a, r, firstval, n)
     r
 end
@@ -51,9 +51,9 @@ end
 
 function pairwise(f::Function, a, ::Type{Symmetric})
     n = length(a)
-    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(0, 0)
+    n == 0 && return Matrix{Core.Inference.return_type(f, NTuple{2,eltype(a)})}(undef,0, 0)
     firstval = f(first(a), first(a))
-    r = Symmetric(Matrix{typeof(firstval)}(n, n))
+    r = Symmetric(Matrix{typeof(firstval)}(undef,n, n))
     pairwise_internal!(f, a, r, firstval, n)
     r
 end
@@ -72,8 +72,7 @@ function pairwise!(f::Function, a, r::AbstractMatrix)
     n == 0 || pairwise_internal!(f, a, r, f(first(a), first(a)),n)
 end
 
-function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T, n)
-    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
+function pairwise_internal!(f, a, r::AbstractMatrix{T}, firstval::T, n) where {T}
     r[1,1] = firstval
     i, j = 2, 1
     @inbounds  while j ≤ n
@@ -87,12 +86,11 @@ function pairwise_internal!{T}(f, a, r::AbstractMatrix{T}, firstval::T, n)
     end
 end
 
-function pairwise_internal!{T}(f, a, r::Symmetric{T}, firstval::T, n)
+function pairwise_internal!(f, a, r::Symmetric{T}, firstval::T, n) where {T}
     r.uplo == 'U' ? pairwise_symmetric_U!(f, a, r, firstval, n) : pairwise_symmetric_L!(f, a, r, firstval, n)
 end
 
 function pairwise_symmetric_L!(f, a, r::Symmetric, firstval, n)
-    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
     r.data[1,1] = firstval
     i, j = 2, 1
     @inbounds while j ≤ n
@@ -107,7 +105,6 @@ function pairwise_symmetric_L!(f, a, r::Symmetric, firstval, n)
 end
 
 function pairwise_symmetric_U!(f, a, r::Symmetric, firstval, n)
-    (1 == start(a) && n == endof(a)) || error("`a` must support linear 1-based indexing")
     r.data[1,1] = firstval
     i, j = 1, 2
     @inbounds while j ≤ n

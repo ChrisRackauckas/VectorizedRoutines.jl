@@ -1,7 +1,7 @@
 """
 From Images.jl
 """
-@generated function findlocalextrema{T,N}(img::AbstractArray{T,N}, region::Union{Tuple{Int},Vector{Int},UnitRange{Int},Int}, edges::Bool, order::Base.Order.Ordering)
+@generated function findlocalextrema(img::AbstractArray{T,N}, region::Union{Tuple{Int},Vector{Int},UnitRange{Int},Int}, edges::Bool, order::Base.Order.Ordering) where {T,N}
     quote
         issubset(region,1:ndims(img)) || throw(ArgumentError("Invalid region."))
         extrema = Tuple{(@ntuple $N d->Int)...}[]

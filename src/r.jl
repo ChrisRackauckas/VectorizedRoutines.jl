@@ -7,7 +7,7 @@ module R
 
   Originally due to RLEVectors.jl
   """
-  function rep{T1,T2}(x::AbstractVector{T1},each::AbstractVector{T2} = ones(Int,length(x)), times::Int = 1)
+  function rep(x::AbstractVector{T1},each::AbstractVector{T2} = ones(Int,length(x)), times::Int = 1) where {T1,T2}
     length(x) != length(each) && throw(ArgumentError("If the argument 'each' is not a scalar, it must have the same length as 'x'."))
     length_out = sum(each * times)
     rval = similar(x,length_out)
@@ -23,7 +23,7 @@ module R
     return(rval)
   end
 
-  function rep!{T1,T2}(x::AbstractVector{T1},rval::AbstractVector{T1},each::AbstractVector{T2} = ones(Int,length(x)))
+  function rep!(x::AbstractVector{T1},rval::AbstractVector{T1},each::AbstractVector{T2} = ones(Int,length(x))) where {T1,T2}
     length_old = length(x)
     length_old != length(each) && throw(ArgumentError("If the argument 'each' is not a scalar, it must have the same length as 'x'."))
     length_out = sum(each) #times =  1
@@ -41,7 +41,7 @@ module R
   end
 
   rep(x::Any,each::Int=1,times::Int = 1) = rep(x,each = [ each for i in eachindex(x) ],times=times)
-  rep{T2}(x::Any,each::AbstractVector{T2},times::Int = 1) = rep([x],each=each,times=times)
+  rep(x::Any,each::AbstractVector{T2},times::Int = 1) where {T2} = rep([x],each=each,times=times)
 
   """
   findinterval(v,x)
@@ -90,7 +90,7 @@ module R
   function rpois!(n::Int,p::Vector{Float64},out::Vector{Int})
     resize!(out,n)
     for i in 1:n
-      @inbounds out[i] = rand(Poisson(p[i])) 
+      @inbounds out[i] = rand(Poisson(p[i]))
     end
   end
 end

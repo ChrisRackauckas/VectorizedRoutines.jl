@@ -37,13 +37,8 @@ macro vcomp(comprehension::Expr, when::Symbol, condition)
     comp_head ∉ [:comprehension, :typed_comprehension] && error("@vcomp not a comprehension")
     when ≠ :when && error("@vcomp expected `when`, got: `$when`")
     T = comp_head == :typed_comprehension ? comp_args[1] : nothing
-    if VERSION < v"0.5-"
-        element  = comp_head == :comprehension ? comp_args[1] : comp_args[2]
-        sequence = comp_head == :comprehension ? comp_args[2] : comp_args[3]
-    else
-        element  = comp_head == :comprehension ? comp_args[1].args[1] : comp_args[2].args[1]
-        sequence = comp_head == :comprehension ? comp_args[1].args[2] : comp_args[2].args[2]
-    end    
+    element  = comp_head == :comprehension ? comp_args[1].args[1] : comp_args[2].args[1]
+    sequence = comp_head == :comprehension ? comp_args[1].args[2] : comp_args[2].args[2]
     result = T ≠ nothing ? :($T[]) : :([])
     loop = Expr(:for, sequence,
                Expr(:block,

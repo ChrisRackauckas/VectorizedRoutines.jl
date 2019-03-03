@@ -2,6 +2,8 @@ __precompile__()
 
 module VectorizedRoutines
 
+using LinearAlgebra
+
 include("internal.jl") #For Julia functions to wrap but reduce imports
 include("matlab.jl")
 include("python.jl")
