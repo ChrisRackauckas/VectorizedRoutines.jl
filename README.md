@@ -69,9 +69,8 @@ pairwise((x,y)->sqrt(x^2 + y^2), xs)
     - `num2str`
     - `max`
     - `numel`
+    
 - Python
-  - `@vcomp` (*vector comprehension*) macro based on Python's list comprehensions
-with a conditional clause to filter elements in a succinct way, ie: `@vcomp Int[i^2 for i in 1:10] when i % 2 == 0    # Int[4, 16, 36, 64, 100]`
 
 - R
   - `rep`
