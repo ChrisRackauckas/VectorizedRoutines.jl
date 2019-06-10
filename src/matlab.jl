@@ -109,6 +109,27 @@ module Matlab
   end
 
   """
+  [C,ia,ic] = unique2(vec::AbstractVector)
+
+  Implementation of matlab function `[C,ia,ic] = unique(A)` where `A` is a Vector.
+  Returns the unique values in a vector and the indices `C,ia,ic  = unique(vec)`, additionally `C = A(ia)` and `A = C(ic)`.
+  """
+  function unique2(vec::AbstractVector)
+      n = length(vec)
+      id = unique(vec)
+      nUnique = length(id)
+      ia = zeros(Int64, nUnique)
+      ic = zeros(Int64, n)
+      for i = 1:nUnique
+          @inbounds ia[i] = findfirst(isequal(id[i]), vec)
+      end
+      for i = 1:n
+          @inbounds ic[i] = findfirst(isequal(vec[i]), id)
+      end
+      return id, ia, ic
+  end
+
+  """
   Originally from MATLABCompat.jl
   """
   function disp(string)
