@@ -7,6 +7,11 @@ using Test
 @test size(Matlab.meshgrid(0:0.1:1)[1]) == (11,11)
 @test Matlab.meshgrid(0:0.1:1) == Matlab.meshgrid(0:0.1:1,0:0.1:1)
 @test size(Matlab.meshgrid(0:0.1:1,0:0.1:1,0:0.1:1)[1]) == (11,11,11)
+A = floor.(10*rand(100))
+C, ia, ic = Matlab.unique2(A)
+@test C == A[ia]
+@test  A == C[ic]
+
 
 # R
 
