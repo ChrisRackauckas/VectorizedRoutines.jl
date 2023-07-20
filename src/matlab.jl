@@ -21,7 +21,7 @@ module Matlab
   function ndgrid(vs::AbstractVector{T}...) where {T}
       n = length(vs)
       sz = map(length, vs)
-      out = ntuple(i->Array{T}(sz), n)
+      out = ntuple(i->Array{T}(undef,sz), n)
       s = 1
       for i=1:n
           a = out[i]::Array
